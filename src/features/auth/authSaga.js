@@ -11,6 +11,8 @@ function* handleLoginRequest(action) {
         const response = yield retry(maxRetries, retryDelay, authApi.loginUser, action.payload)
         if (response?.data?.success) {
             yield put(loginSuccess(response.data))
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(user));
         } else {
             yield put(loginFailure('Respuesta inválida del servidor'))
         }

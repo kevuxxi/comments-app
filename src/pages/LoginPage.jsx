@@ -1,31 +1,45 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { loginRequest } from '../features/auth/authSlice';
+import { loginRequest, registerRequest } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { loading, error, token } = useSelector((state) => state.auth)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [register, setRegister] = useState(false)
 
 
-    const handleLogin = () => {
+    const handleLogin = (e) => {
         e.preventDefault();
         dispatch(loginRequest({ username, password }))
     }
+
+    const handleRegister = (e) => {
+        e.preventDefault();
+        dispatch(registerRequest({ username, password }))
+    }
+
 
     if (token) {
         navigate("/comments");
     }
 
+    const changeRegister = () => {
+        return setRegister(!register)
+    }
+
     return (
         <div>
-            <h2>Iniciar sesión</h2>
+            <h2>{register ? 'Registrarse' : 'Iniciar Sesion'}</h2>
 
             {error && <p>{error}</p>}
             {loading && <p>Cargando...</p>}
 
-            <form onSubmit={handleLogin} >
+
+            <form onSubmit={register ? handleRegister : handleLogin}>
                 <input
                     type="text"
                     placeholder='Usuario'
@@ -41,13 +55,25 @@ const LoginPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button disabled={loading}>
-                    {loading ? "Ingresando..." : "Login"}
+                <button type='submit' disabled={loading}>
+                    {loading
+                        ? register
+                            ? "Registrando..."
+                            : "Ingresando..."
+                        : register
+                            ? "Registrarse"
+                            : "Login"}
                 </button>
             </form>
 
 
-        </div>
+            <button onClick={changeRegister} style={{ marginTop: "10px" }}>
+                {register
+                    ? "¿Ya tienes cuenta? Inicia sesión"
+                    : "¿No tienes cuenta? Regístrate"}
+            </button>
+
+        </div >
     )
 }
 

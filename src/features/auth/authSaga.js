@@ -1,6 +1,6 @@
 import { put, call, takeLatest, retry, delay } from "redux-saga/effects";
 import { registerFailure, registerRequest, registerSuccess, logout, loginFailure, loginRequest, loginSuccess } from './authSlice'
-
+import { registerUser, loginUser } from "../../services/authService";
 
 function* handleLoginRequest(action) {
     try {
@@ -8,9 +8,9 @@ function* handleLoginRequest(action) {
         const maxRetries = 3
         const retryDelay = 1000
 
-        const response = yield retry(maxRetries, retryDelay, authApi.loginRequest, action.payload)
+        const response = yield retry(maxRetries, retryDelay, authApi.loginUser, action.payload)
         if (response?.data?.success) {
-            yield put(loginSuccess())
+            yield put(loginSuccess(response.data))
         } else {
             yield put(loginFailure('Respuesta inválida del servidor'))
         }
@@ -24,9 +24,9 @@ function* handleRegisterRequest(action) {
     try {
         yield delay(500)
 
-        const response = yield call(authApi.registerRequest, action.payload);
+        const response = yield call(authApi.registerUser, action.payload);
         if (response?.data?.success) {
-            yield put(registerSuccess())
+            yield put(registerSuccess(response.data))
         } else {
             yield put(registerFailure('Respuesta invalida del servidor'))
         }

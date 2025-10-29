@@ -1,15 +1,13 @@
 import axios from "axios";
 
-localStorage.setItem('token', "fake_token_12345")
-
-export const API = axios.create({
+const axiosInstance = axios.create({
     baseURL: 'http://localhost:5173/api',
     headers: {
         "Content-Type": "application/json; charset=UTF-8",
     },
 })
 
-API.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
 
     if (token) {
@@ -18,7 +16,7 @@ API.interceptors.request.use((config) => {
     return config
 })
 
-PI.interceptors.response.use(
+axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         // Estructura estándar de error
@@ -58,3 +56,5 @@ PI.interceptors.response.use(
         return Promise.reject(customError);
     }
 );
+
+export default axiosInstance;

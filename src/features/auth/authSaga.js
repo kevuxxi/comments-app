@@ -1,50 +1,51 @@
-import { put, call, takeLatest, retry, delay } from "redux-saga/effects";
-import { registerFailure, registerRequest, registerSuccess, logout, loginFailure, loginRequest, loginSuccess } from './authSlice'
-import { registerUser, loginUser } from "../../services/authService";
+import { all, call, fork, put, takeLatest } from "redux-saga/effects";
+import {
+    loginFailure,
+    loginRequest,
+    loginSuccess,
+    registerFailure,
+    registerRequest,
+    registerSuccess,
+} from "./authSlice";
+import { loginUser, registerUser } from "../../services/authService";
 
-function* handleLoginRequest(action) {
+function* handleLogin(action) {
     try {
-        yield delay(500)
-        const maxRetries = 3
-        const retryDelay = 1000
+        const response = yield call(loginUser, action.payload);
+        const { token, user } = response.data || {};
 
-        const response = yield retry(maxRetries, retryDelay, authApi.loginUser, action.payload)
-        if (response?.data?.success) {
-            yield put(loginSuccess(response.data))
+        yield put(loginSuccess({ token, user }));
+
+        if (token) {
             localStorage.setItem("token", token);
+        }
+        if (user) {
             localStorage.setItem("user", JSON.stringify(user));
-        } else {
-            yield put(loginFailure('Respuesta inválida del servidor'))
         }
     } catch (error) {
-        yield put(loginFailure(error.message || 'Error al intentar inicir sesion'))
+        yield put(loginFailure(error.message || "Error al intentar iniciar sesión"));
     }
 }
 
-
-function* handleRegisterRequest(action) {
+function* handleRegister(action) {
     try {
-        yield delay(500)
+        const response = yield call(registerUser, action.payload);
+        const { token, user } = response.data || {};
 
-        const response = yield call(authApi.registerUser, action.payload);
-        if (response?.data?.success) {
-            yield put(registerSuccess(response.data))
-        } else {
-            yield put(registerFailure('Respuesta invalida del servidor'))
-        }
+        yield put(registerSuccess({ token, user }));
     } catch (error) {
-        yield put(registerFailure(error.message || 'Respuesta invalida del servidor'))
+        yield put(registerFailure(error.message || "Respuesta inválida del servidor"));
     }
 }
-
-
-
-
 
 export function* watchLogin() {
-    yield takeLatest(loginRequest.type, handleLoginRequest)
+    yield takeLatest(loginRequest.type, handleLogin);
 }
 
 export function* watchRegister() {
-    yield takeLatest(registerRequest.type, handleRegisterRequest)
+    yield takeLatest(registerRequest.type, handleRegister);
+}
+
+export default function* authSaga() {
+    yield all([fork(watchLogin), fork(watchRegister)]);
 }

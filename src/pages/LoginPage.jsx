@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { loginRequest, registerRequest } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +23,11 @@ const LoginPage = () => {
     }
 
 
-    if (token) {
-        navigate("/comments");
-    }
+    useEffect(() => {
+        if (token) {
+            navigate("/comments");
+        }
+    }, [token, navigate]);
 
     const changeRegister = () => {
         return setRegister(!register)

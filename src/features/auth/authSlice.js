@@ -12,16 +12,16 @@ const authSlice = createSlice({
     initialState,
     reducers: {
 
-        loginRequest: (state, action) => {
+        loginRequest: (state) => {
             state.loading = true
             state.error = null
-            state.token = action.payload
         },
         loginSuccess: (state, action) => {
+            const { token, user } = action.payload || {}
             state.loading = false
             state.error = null
-            state.token = action.payload
-            state.user = action.payload
+            state.token = token ?? null
+            state.user = user ?? null
         },
 
         loginFailure: (state, action) => {
@@ -30,16 +30,16 @@ const authSlice = createSlice({
             state.token = null
             state.user = null
         },
-        registerRequest: (state, action) => {
+        registerRequest: (state) => {
             state.loading = true
             state.error = null
-            state.token = action.payload
         },
         registerSuccess: (state, action) => {
+            const { token, user } = action.payload || {}
             state.loading = false
             state.error = null
-            state.token = action.payload
-            state.user = action.payload
+            state.token = token ?? null
+            state.user = user ?? null
         },
 
         registerFailure: (state, action) => {
@@ -53,6 +53,8 @@ const authSlice = createSlice({
             state.error = null
             state.token = null
             state.user = null
+            localStorage.removeItem("token")
+            localStorage.removeItem("user")
         },
     }
 })

@@ -41,5 +41,5 @@ export function* watchLikeComments() {
 }
 
 export default function* commentSaga() {
-    yield all([fork(watchComments), fork(watchCreateComments), fork(wactchLikeComments)]);
+    yield all([fork(watchComments), fork(watchCreateComments), fork(watchLikeComments)]);
 }

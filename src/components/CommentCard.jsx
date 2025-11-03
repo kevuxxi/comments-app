@@ -1,8 +1,20 @@
-import React from 'react'
+import { useDispatch } from "react-redux";
+import { likeComment } from "../services/commentService";
 
-const CommentCard = () => {
+const CommentCard = ({ comment }) => {
+    const dispatch = useDispatch();
+
+    const handleSendLikes = () => {
+        dispatch(likeComment(comment.id))
+    }
+
     return (
-        <div>CommentCard</div>
+        <div>
+            <p>{comment.user}</p>
+            <p>{comment.text}</p>
+            <p>{comment.likes}</p>
+            <button onClick={handleSendLikes}>❤️ Like</button>
+        </div>
     )
 }
 

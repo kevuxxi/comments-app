@@ -1,11 +1,11 @@
 import { useDispatch } from "react-redux";
-import { likeComment } from "../services/commentService";
+import { likeCommentRequest } from "../features/comments/commentsSlice";
 
 const CommentCard = ({ comment }) => {
     const dispatch = useDispatch();
 
     const handleSendLikes = () => {
-        dispatch(likeComment(comment._id))
+        dispatch(likeCommentRequest(comment._id))
     }
 
     return (

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { loginRequest, registerRequest } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -22,6 +23,9 @@ const LoginPage = () => {
         dispatch(registerRequest({ username, password }))
     }
 
+    useEffect(() => {
+        if (error) toast.error(error);
+    }, [error]);
 
     useEffect(() => {
         if (token) {
@@ -37,7 +41,7 @@ const LoginPage = () => {
         <div>
             <h2>{register ? 'Registrarse' : 'Iniciar Sesion'}</h2>
 
-            {error && <p>{error}</p>}
+
             {loading && <p>Cargando...</p>}
 
 

@@ -8,6 +8,7 @@ import {
     registerSuccess,
 } from "./authSlice";
 import { loginUser, registerUser } from "../../services/authService";
+import { setGlobalLoading } from "../app/appSlice";
 
 function* handleLogin(action) {
     try {
@@ -24,6 +25,8 @@ function* handleLogin(action) {
         }
     } catch (error) {
         yield put(loginFailure(error.message || "Error al intentar iniciar sesión"));
+    } finally {
+        yield put(setGlobalLoading(false)); // 🧹 desactivar spinner
     }
 }
 
@@ -35,6 +38,8 @@ function* handleRegister(action) {
         yield put(registerSuccess({ token, user }));
     } catch (error) {
         yield put(registerFailure(error.message || "Respuesta inválida del servidor"));
+    } finally {
+        yield put(setGlobalLoading(false)); // 🧹 desactivar spinner
     }
 }
 

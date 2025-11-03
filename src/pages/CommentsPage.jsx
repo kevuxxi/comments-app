@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react";
 import { createCommentRequest, fetchCommentsRequest } from "../features/comments/commentsSlice";
 import CommentCard from "../components/CommentCard";
+import { toast } from "react-toastify";
 
 const CommentsPage = () => {
 
@@ -9,28 +10,33 @@ const CommentsPage = () => {
     const { comments, error, loading } = useSelector((state) => state.comments)
     const [textareaValue, setTextareaValue] = useState('');
 
-
     useEffect(() => {
         dispatch(fetchCommentsRequest())
-    }, [])
+    }, [dispatch])
 
-    handleChange = (event) => {
+    useEffect(() => {
+        if (error) toast.error(error);
+    }, [error]);
+
+    const handleChange = (event) => {
         setTextareaValue(event.target.value);
     }
 
+    const handleSubmit = (event) => {
+        if (!textareaValue.trim()) return;
 
-    const handleSudmit = () => {
-        dispatch(createCommentRequest({ textareaValue }))
+        event.preventDefault();
+        dispatch(createCommentRequest({ text: textareaValue }))
+        setTextareaValue('')
     }
-
 
     return (
         <div>
             <h2>Comentarios</h2>
-            {error && <p>{error}</p>}
+
             {loading && <p>Cargando...</p>}
 
-            <form onSubmit={handleSudmit}>
+            <form onSubmit={handleSubmit}>
                 <label>
                     Comentar:
                     <textarea
@@ -45,7 +51,7 @@ const CommentsPage = () => {
                 <button type="submit">Enviar</button>
             </form>
 
-            {comments.map((comment) => (<li key={comment.id}><CommentCard comment={comment} /></li>))}
+            <ul> {comments.map((comment) => (<li key={comment._id}><CommentCard comment={comment} /></li>))}</ul>
         </div>
     )
 }

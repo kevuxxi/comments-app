@@ -17,7 +17,7 @@ function* handleCreateComment(action) {
         const response = yield call(createComment, action.payload);
         yield put(createCommentSuccess(response.data))
     } catch (error) {
-        yield put(createCommentFailure(error.message || 'No se crear el comentario'))
+        yield put(createCommentFailure(error.message || 'No se pudo crear el comentario'))
     }
 }
 
@@ -36,7 +36,7 @@ export function* watchComments() {
 export function* watchCreateComments() {
     yield takeLatest(createCommentRequest.type, handleCreateComment)
 }
-export function* wactchLikeComments() {
+export function* watchLikeComments() {
     yield takeLatest(likeCommentRequest.type, handleLikeComment)
 }
 

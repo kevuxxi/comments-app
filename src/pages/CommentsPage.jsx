@@ -51,7 +51,7 @@ const CommentsPage = () => {
                 <button type="submit">Enviar</button>
             </form>
 
-            <ul> {comments.map((comment) => (<li key={comment._id}><CommentCard comment={comment} /></li>))}</ul>
+            <ul> {Array.isArray(comments) && comments.map((comment) => (<li key={comment._id}><CommentCard comment={comment} /></li>))}</ul>
         </div>
     )
 }

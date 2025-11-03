@@ -8,11 +8,13 @@ import {
     registerSuccess,
 } from "./authSlice";
 import { loginUser, registerUser } from "../../services/authService";
+import { setGlobalLoading } from "../app/appSlice";
 
 function* handleLogin(action) {
     try {
+        yield put(setGlobalLoading(true));
         const response = yield call(loginUser, action.payload);
-        const { token, user } = response.data || {};
+        const { token, user } = response?.data ?? {};
 
         yield put(loginSuccess({ token, user }));
 
@@ -24,17 +26,22 @@ function* handleLogin(action) {
         }
     } catch (error) {
         yield put(loginFailure(error.message || "Error al intentar iniciar sesión"));
+    } finally {
+        yield put(setGlobalLoading(false));
     }
 }
 
 function* handleRegister(action) {
     try {
+        yield put(setGlobalLoading(true));
         const response = yield call(registerUser, action.payload);
-        const { token, user } = response.data || {};
+        const { token, user } = response?.data ?? {};
 
         yield put(registerSuccess({ token, user }));
     } catch (error) {
         yield put(registerFailure(error.message || "Respuesta inválida del servidor"));
+    } finally {
+        yield put(setGlobalLoading(false));
     }
 }
 

@@ -1,6 +1,6 @@
 import { all, call, fork, put, takeLatest } from "redux-saga/effects";
 import { createCommentFailure, createCommentSuccess, createCommentRequest, likeCommentFailure, likeCommentSuccess, likeCommentRequest, fetchCommentsFailure, fetchCommentsSuccess, fetchCommentsRequest } from "./commentsSlice";
-import { getComments, createComment, likeComment } from '../../services/commentService'
+import { getComments, likeComment, createComment } from "../../services/commentService";
 
 
 function* handleFetchComments(action) {

@@ -5,7 +5,7 @@ const CommentCard = ({ comment }) => {
     const dispatch = useDispatch();
 
     const handleSendLikes = () => {
-        dispatch(likeComment(comment.id))
+        dispatch(likeComment(comment._id))
     }
 
     return (

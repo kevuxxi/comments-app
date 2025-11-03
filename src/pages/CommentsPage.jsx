@@ -1,40 +1,50 @@
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { createCommentRequest, fetchCommentsRequest } from "../features/comments/commentsSlice";
 import CommentCard from "../components/CommentCard";
-import { toast } from "react-toastify";
 
 const CommentsPage = () => {
-
     const dispatch = useDispatch();
-    const { comments, error, loading } = useSelector((state) => state.comments)
-    const [textareaValue, setTextareaValue] = useState('');
+    const {
+        comments = [],
+        error,
+        loading,
+        creating,
+        liking,
+    } = useSelector((state) => state.comments ?? {});
+    const [textareaValue, setTextareaValue] = useState("");
 
     useEffect(() => {
-        dispatch(fetchCommentsRequest())
-    }, [dispatch])
+        dispatch(fetchCommentsRequest());
+    }, [dispatch]);
 
     useEffect(() => {
-        if (error) toast.error(error);
+        if (error) {
+            toast.error(error);
+        }
     }, [error]);
 
     const handleChange = (event) => {
         setTextareaValue(event.target.value);
-    }
+    };
 
     const handleSubmit = (event) => {
-        if (!textareaValue.trim()) return;
-
         event.preventDefault();
-        dispatch(createCommentRequest({ text: textareaValue }))
-        setTextareaValue('')
-    }
+        const text = textareaValue.trim();
+        if (!text) {
+            return;
+        }
+        dispatch(createCommentRequest({ text }));
+        setTextareaValue("");
+    };
 
     return (
         <div>
             <h2>Comentarios</h2>
 
-            {loading && <p>Cargando...</p>}
+            {loading && <p>Cargando comentarios...</p>}
+            {creating && <p>Publicando comentario...</p>}
 
             <form onSubmit={handleSubmit}>
                 <label>
@@ -48,12 +58,26 @@ const CommentsPage = () => {
                 </label>
                 <p>Comentario actual: {textareaValue}</p>
 
-                <button type="submit">Enviar</button>
+                <button type="submit" disabled={creating}>
+                    Enviar
+                </button>
             </form>
 
-            <ul> {Array.isArray(comments) && comments.map((comment) => (<li key={comment._id}><CommentCard comment={comment} /></li>))}</ul>
+            <ul>
+                {comments.map((comment) => {
+                    const commentId = comment?._id ?? comment?.id;
+                    if (!commentId) {
+                        return null;
+                    }
+                    return (
+                        <li key={commentId}>
+                            <CommentCard comment={comment} isLiking={liking} />
+                        </li>
+                    );
+                })}
+            </ul>
         </div>
-    )
-}
+    );
+};
 
-export default CommentsPage
+export default CommentsPage;

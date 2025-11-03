@@ -1,30 +1,31 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux'
-import { loginRequest, registerRequest } from '../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { loginRequest, registerRequest } from "../features/auth/authSlice";
 
 const LoginPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, error, token } = useSelector((state) => state.auth)
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [register, setRegister] = useState(false)
+    const { loading, error, token } = useSelector((state) => state.auth);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [isRegisterMode, setIsRegisterMode] = useState(false);
 
+    const handleLogin = (event) => {
+        event.preventDefault();
+        dispatch(loginRequest({ username, password }));
+    };
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        dispatch(loginRequest({ username, password }))
-    }
-
-    const handleRegister = (e) => {
-        e.preventDefault();
-        dispatch(registerRequest({ username, password }))
-    }
+    const handleRegister = (event) => {
+        event.preventDefault();
+        dispatch(registerRequest({ username, password }));
+    };
 
     useEffect(() => {
-        if (error) toast.error(error);
+        if (error) {
+            toast.error(error);
+        }
     }, [error]);
 
     useEffect(() => {
@@ -33,54 +34,50 @@ const LoginPage = () => {
         }
     }, [token, navigate]);
 
-    const changeRegister = () => {
-        return setRegister(!register)
-    }
+    const toggleMode = () => {
+        setIsRegisterMode((prev) => !prev);
+    };
 
     return (
         <div>
-            <h2>{register ? 'Registrarse' : 'Iniciar Sesion'}</h2>
-
+            <h2>{isRegisterMode ? "Registrarse" : "Iniciar sesión"}</h2>
 
             {loading && <p>Cargando...</p>}
 
-
-            <form onSubmit={register ? handleRegister : handleLogin}>
+            <form onSubmit={isRegisterMode ? handleRegister : handleLogin}>
                 <input
                     type="text"
-                    placeholder='Usuario'
+                    placeholder="Usuario"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(event) => setUsername(event.target.value)}
                     required
                 />
 
                 <input
-                    type='password'
-                    placeholder='Contraseña'
+                    type="password"
+                    placeholder="Contraseña"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(event) => setPassword(event.target.value)}
                     required
                 />
-                <button type='submit' disabled={loading}>
+                <button type="submit" disabled={loading}>
                     {loading
-                        ? register
+                        ? isRegisterMode
                             ? "Registrando..."
                             : "Ingresando..."
-                        : register
+                        : isRegisterMode
                             ? "Registrarse"
                             : "Login"}
                 </button>
             </form>
 
-
-            <button onClick={changeRegister} style={{ marginTop: "10px" }}>
-                {register
+            <button onClick={toggleMode} style={{ marginTop: "10px" }}>
+                {isRegisterMode
                     ? "¿Ya tienes cuenta? Inicia sesión"
                     : "¿No tienes cuenta? Regístrate"}
             </button>
+        </div>
+    );
+};
 
-        </div >
-    )
-}
-
-export default LoginPage
+export default LoginPage;

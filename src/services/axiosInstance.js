@@ -1,32 +1,33 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5173/api',
+    baseURL,
     headers: {
         "Content-Type": "application/json; charset=UTF-8",
     },
-})
+});
 
 axiosInstance.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
-})
+
+    return config;
+});
 
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Estructura estándar de error
         const customError = {
             message: "Error inesperado. Intenta nuevamente.",
-            status: error.response?.status || 500,
+            status: error.response?.status ?? 500,
             url: error.config?.url,
         };
 
-        // Personalización según código HTTP
         if (error.response) {
             switch (error.response.status) {
                 case 400:
@@ -49,10 +50,9 @@ axiosInstance.interceptors.response.use(
             }
         }
 
-        console.error(`❌ [API ERROR]: ${customError.status} → ${customError.url}`);
+        console.error(`[API ERROR]: ${customError.status} - ${customError.url}`);
         console.error(customError);
 
-        // Propagar error estandarizado
         return Promise.reject(customError);
     }
 );

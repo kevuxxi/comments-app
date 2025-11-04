@@ -39,43 +39,70 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
-            <h2>{isRegisterMode ? "Registrarse" : "Iniciar sesión"}</h2>
+        <div className="page auth-page">
+            <div className="auth-card">
+                <h1 className="auth-card__title">
+                    {isRegisterMode ? "Crea tu cuenta" : "Bienvenido"}
+                </h1>
+                <h2 className="auth-card__subtitle">
+                    {isRegisterMode
+                        ? "Regístrate"
+                        : "Iniciar sesion"}
+                </h2>
 
-            {loading && <p>Cargando...</p>}
+                <form
+                    className="auth-form"
+                    onSubmit={isRegisterMode ? handleRegister : handleLogin}
+                >
+                    <label className="auth-form__label" htmlFor="username">
+                        Usuario
+                    </label>
+                    <input
+                        id="username"
+                        className="auth-form__input"
+                        type="text"
+                        placeholder="Tu nombre de usuario"
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
+                        autoComplete="username"
+                        required
+                    />
 
-            <form onSubmit={isRegisterMode ? handleRegister : handleLogin}>
-                <input
-                    type="text"
-                    placeholder="Usuario"
-                    value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                    required
-                />
+                    <label className="auth-form__label" htmlFor="password">
+                        Contraseña
+                    </label>
+                    <input
+                        id="password"
+                        className="auth-form__input"
+                        type="password"
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        autoComplete={isRegisterMode ? "new-password" : "current-password"}
+                        required
+                    />
 
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
-                />
-                <button type="submit" disabled={loading}>
-                    {loading
-                        ? isRegisterMode
-                            ? "Registrando..."
-                            : "Ingresando..."
-                        : isRegisterMode
-                            ? "Registrarse"
-                            : "Login"}
+                    <button
+                        type="submit"
+                        className="btn btn--primary auth-form__submit"
+                        disabled={loading}
+                    >
+                        {loading
+                            ? isRegisterMode
+                                ? "Registrando..."
+                                : "Ingresando..."
+                            : isRegisterMode
+                                ? "Registrarse"
+                                : "Iniciar sesion"}
+                    </button>
+                </form>
+
+                <button className="btn btn--ghost auth-card__toggle" onClick={toggleMode}>
+                    {isRegisterMode
+                        ? "¿Ya tienes cuenta? Inicia sesión"
+                        : "¿No tienes cuenta? Regístrate"}
                 </button>
-            </form>
-
-            <button onClick={toggleMode} style={{ marginTop: "10px" }}>
-                {isRegisterMode
-                    ? "¿Ya tienes cuenta? Inicia sesión"
-                    : "¿No tienes cuenta? Regístrate"}
-            </button>
+            </div>
         </div>
     );
 };

@@ -13,6 +13,8 @@ const CommentsPage = () => {
         creating,
         liking,
     } = useSelector((state) => state.comments ?? {});
+    const { token } = useSelector((state) => state.auth);
+
     const [textareaValue, setTextareaValue] = useState("");
 
     useEffect(() => {
@@ -45,8 +47,7 @@ const CommentsPage = () => {
 
             {loading && <p>Cargando comentarios...</p>}
             {creating && <p>Publicando comentario...</p>}
-
-            <form onSubmit={handleSubmit}>
+            {!token ? (<p>Inicia sesión para comentar.</p>) : (<form onSubmit={handleSubmit}>
                 <label>
                     Comentar:
                     <textarea
@@ -61,7 +62,7 @@ const CommentsPage = () => {
                 <button type="submit" disabled={creating}>
                     Enviar
                 </button>
-            </form>
+            </form>)}
 
             <ul>
                 {comments.map((comment) => {

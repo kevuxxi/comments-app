@@ -8,18 +8,19 @@ const LoginPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, error, token } = useSelector((state) => state.auth);
-    const [username, setUsername] = useState("");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isRegisterMode, setIsRegisterMode] = useState(false);
 
     const handleLogin = (event) => {
         event.preventDefault();
-        dispatch(loginRequest({ username, password }));
+        dispatch(loginRequest({ email, password }));
     };
 
     const handleRegister = (event) => {
         event.preventDefault();
-        dispatch(registerRequest({ username, password }));
+        dispatch(registerRequest({ name, email, password }));
     };
 
     useEffect(() => {
@@ -54,17 +55,32 @@ const LoginPage = () => {
                     className="auth-form"
                     onSubmit={isRegisterMode ? handleRegister : handleLogin}
                 >
-                    <label className="auth-form__label" htmlFor="username">
-                        Usuario
+                    <label className="auth-form__label" htmlFor="name">
+                        Nombre
                     </label>
                     <input
-                        id="username"
+                        id="name"
                         className="auth-form__input"
                         type="text"
-                        placeholder="Tu nombre de usuario"
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                        autoComplete="username"
+                        placeholder="Tu nombre"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        autoComplete="name"
+                        required
+                        disabled={!isRegisterMode}
+                    />
+
+                    <label className="auth-form__label" htmlFor="email">
+                        Email
+                    </label>
+                    <input
+                        id="email"
+                        className="auth-form__input"
+                        type="email"
+                        placeholder="tucorreo@ejemplo.com"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        autoComplete="email"
                         required
                     />
 

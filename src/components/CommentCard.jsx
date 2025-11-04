@@ -1,13 +1,31 @@
 ﻿import { useMemo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { likeCommentRequest } from "../features/comments/commentsSlice";
 
-const CommentCard = ({ comment, isLiking = false }) => {
-    const dispatch = useDispatch();
+const selectCurrentUserId = (state) => {
+    const user = state?.auth?.user;
+    return (
+        user?.id ??
+        user?.user_id ??
+        user?.userId ??
+        user?.userID ??
+        user?.profile?.id ??
+        null
+    );
+};
 
-    const commentId = comment?._id ?? comment?.id;
-    const username = comment?.user ?? "An\u00F3nimo";
+const CommentCard = ({ comment, isLiking = false, currentUserId }) => {
+    const dispatch = useDispatch();
+    const fallbackUserId = useSelector(selectCurrentUserId);
+
+    const activeUserId = currentUserId ?? fallbackUserId;
+
+    const commentId = comment?.id ?? comment?._id ?? comment?.comment_id ?? null;
+    const username =
+        comment?.user ??
+        (comment?.userId ? `Usuario #${comment.userId}` : "Anónimo");
     const likes = comment?.likes ?? 0;
+    const dislikes = comment?.dislikes ?? 0;
 
     const initials = useMemo(() => {
         if (!username) {
@@ -17,10 +35,16 @@ const CommentCard = ({ comment, isLiking = false }) => {
     }, [username]);
 
     const handleSendLikes = () => {
-        if (!commentId) {
+        if (!commentId || !activeUserId) {
             return;
         }
-        dispatch(likeCommentRequest(commentId));
+        dispatch(
+            likeCommentRequest({
+                commentId,
+                userId: activeUserId,
+                reaction: "like",
+            })
+        );
     };
 
     return (
@@ -32,7 +56,10 @@ const CommentCard = ({ comment, isLiking = false }) => {
                 <header className="comment-card__header">
                     <span className="comment-card__user">{username}</span>
                     <span className="comment-card__likes" aria-live="polite">
-                        {likes} {likes === 1 ? "like" : "likes"}
+                        <span className="comment-card__likes-count">?? {likes}</span>
+                        {dislikes > 0 && (
+                            <span className="comment-card__dislikes"> · ?? {dislikes}</span>
+                        )}
                     </span>
                 </header>
                 <p className="comment-card__text">{comment?.text ?? ""}</p>
@@ -41,9 +68,9 @@ const CommentCard = ({ comment, isLiking = false }) => {
                         type="button"
                         className="btn btn--ghost comment-card__like-btn"
                         onClick={handleSendLikes}
-                        disabled={isLiking}
+                        disabled={!activeUserId || isLiking}
                     >
-                        {isLiking ? "Procesando..." : "\u2764\uFE0F Like"}
+                        {isLiking ? "Procesando..." : "?? Like"}
                     </button>
                 </div>
             </div>

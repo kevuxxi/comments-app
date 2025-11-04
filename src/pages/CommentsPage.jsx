@@ -1,8 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
+﻿import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { createCommentRequest, fetchCommentsRequest } from "../features/comments/commentsSlice";
 import CommentCard from "../components/CommentCard";
+import Navbar from "../components/Navbar";
 
 const CommentsPage = () => {
     const dispatch = useDispatch();
@@ -13,6 +14,8 @@ const CommentsPage = () => {
         creating,
         liking,
     } = useSelector((state) => state.comments ?? {});
+    const { token } = useSelector((state) => state.auth ?? {});
+
     const [textareaValue, setTextareaValue] = useState("");
 
     useEffect(() => {
@@ -39,45 +42,73 @@ const CommentsPage = () => {
         setTextareaValue("");
     };
 
+    const isAuthenticated = Boolean(token);
+
     return (
-        <div>
-            <h2>Comentarios</h2>
+        <div className="page comments-page">
+            <Navbar />
+            <div className="page__body">
+                <header className="page__header">
+                    <div>
+                        <h2 className="page__title">Comentarios</h2>
+                        <p className="page__subtitle">Comparte tus ideas con la comunidad.</p>
+                    </div>
+                    <div className="page__status-group">
+                        {loading && (
+                            <span className="status-pill status-pill--loading">Cargando comentarios...</span>
+                        )}
+                        {creating && (
+                            <span className="status-pill status-pill--creating">Publicando comentario...</span>
+                        )}
+                    </div>
+                </header>
 
-            {loading && <p>Cargando comentarios...</p>}
-            {creating && <p>Publicando comentario...</p>}
+                {!isAuthenticated ? (
+                    <div className="page__empty">
+                        <p>Inicia sesión para comentar.</p>
+                    </div>
+                ) : (
+                    <form className="comment-form" onSubmit={handleSubmit}>
+                        <label className="comment-form__label" htmlFor="comment-textarea">
+                            Tu comentario
+                        </label>
+                        <textarea
+                            id="comment-textarea"
+                            className="comment-form__input"
+                            value={textareaValue}
+                            onChange={handleChange}
+                            rows={5}
+                            maxLength={500}
+                            placeholder="Escribe algo interesante..."
+                            disabled={creating}
+                        />
+                        <div className="comment-form__footer">
+                            <span className="comment-form__counter">{textareaValue.length}/500</span>
+                            <button type="submit" className="btn btn--primary" disabled={creating}>
+                                Enviar
+                            </button>
+                        </div>
+                    </form>
+                )}
 
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Comentar:
-                    <textarea
-                        value={textareaValue}
-                        onChange={handleChange}
-                        rows={5}
-                        cols={30}
-                    />
-                </label>
-                <p>Comentario actual: {textareaValue}</p>
-
-                <button type="submit" disabled={creating}>
-                    Enviar
-                </button>
-            </form>
-
-            <ul>
-                {comments.map((comment) => {
-                    const commentId = comment?._id ?? comment?.id;
-                    if (!commentId) {
-                        return null;
-                    }
-                    return (
-                        <li key={commentId}>
-                            <CommentCard comment={comment} isLiking={liking} />
-                        </li>
-                    );
-                })}
-            </ul>
+                <ul className="comments-list">
+                    {comments.map((comment) => {
+                        const commentId = comment?._id ?? comment?.id;
+                        if (!commentId) {
+                            return null;
+                        }
+                        return (
+                            <li className="comments-list__item" key={commentId}>
+                                <CommentCard comment={comment} isLiking={liking} />
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
         </div>
     );
 };
 
 export default CommentsPage;
+
+
